@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Plant &amp; Competitor Pins — Project Creation Prototype</title>
+<style>
+  :root{
+    --navy:#0e1b3d;
+    --navy-light:#16234d;
+    --yellow:#f7c948;
+    --green:#2e8b47;
+    --red:#d64545;
+    --blue:#3b5bdb;
+    --job:#4bacce;
+    --gray-border:#d7dbe3;
+    --text:#1f2937;
+    --muted:#6b7280;
+  }
+  *{box-sizing:border-box;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    margin:0;
+    background:#eef0f4;
+    color:var(--text);
+    padding:24px;
+  }
+
+  /* ---------- Prototype meta toolbar ---------- */
+  .proto-note{
+    max-width:1450px;
+    margin:0 auto 18px auto;
+    background:#fff;
+    border:1px solid var(--gray-border);
+    border-left:4px solid var(--navy);
+    border-radius:8px;
+    padding:14px 18px;
+    font-size:13.5px;
+    line-height:1.55;
+  }
+  .proto-note b{color:var(--navy);}
+  .mobile-note{
+    max-width:360px;
+    margin:0 auto 16px auto;
+    background:#fff8e6;
+    border:1px solid #f0d78c;
+    border-left:4px solid #b8860b;
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:12.5px;
+    line-height:1.55;
+    color:#6b4e00;
+    display:flex;
+    gap:8px;
+  }
+  .mobile-note .mn-icon{flex-shrink:0;font-size:15px;line-height:1.4;}
+  .mobile-note b{color:#5a3f00;}
+  .proto-toolbar{
+    max-width:1450px;
+    margin:0 auto 20px auto;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .proto-toolbar span{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+  .view-btn, .drawer-btn{
+    border:1px solid var(--gray-border);
+    background:#fff;
+    padding:7px 14px;
+    border-radius:6px;
+    font-size:13px;
+    cursor:pointer;
+    color:var(--text);
+  }
+  .view-btn.active, .drawer-btn.active{
+    background:var(--navy);
+    color:#fff;
+    border-color:var(--navy);
+  }
+  .view-btn:disabled{opacity:.4;cursor:not-allowed;}
+
+  .stage{max-width:1450px;margin:0 auto;}
+  .view{display:none;}
+  .view.active{display:block;}
+
+  /* ---------- Desktop app shell ---------- */
+  .app-shell{
+    display:flex;
+    height:800px;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+  }
+  .app-sidebar{
+    width:64px;
+    background:var(--navy);
+    flex-shrink:0;
+    padding:16px 0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:18px;
+  }
+  .app-sidebar .logo{
+    width:26px;height:26px;border-radius:6px;background:var(--yellow);margin-bottom:8px;
+  }
+  .app-sidebar .ic{width:20px;height:20px;border-radius:4px;background:rgba(255,255,255,.18);}
+  .app-sidebar .ic.on{background:var(--yellow);}
+  .app-main{
+    flex:1;
+    background:#f4f5f8;
+    opacity:.45;
+    padding:28px;
+    filter:blur(.3px);
+  }
+  .app-main h2{margin:0 0 14px 0;font-size:26px;}
+  .app-main .row{height:14px;background:#dfe2e8;border-radius:4px;margin-bottom:10px;width:70%;}
+
+  .drawer{
+    width:980px;
+    flex-shrink:0;
+    background:#fff;
+    border-left:1px solid var(--gray-border);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .drawer-head{
+    padding:22px 26px 14px 26px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--gray-border);
+  }
+  .drawer-head h1{font-size:26px;margin:0;color:var(--navy);}
+  .drawer-body{
+    flex:1;
+    overflow-y:auto;
+    padding:16px 26px;
+  }
+  .step-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 0;
+    font-size:16px;
+    color:#374151;
+  }
+  .step-row .num{
+    width:22px;height:22px;border-radius:50%;
+    border:1.5px solid #3b5bdb;
+    color:#3b5bdb;
+    font-size:11px;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+  }
+  .step-row.active .num{background:#3b5bdb;color:#fff;}
+  .step-row.active{font-weight:600;color:var(--navy);}
+  .step-row.step-clickable{cursor:pointer;}
+  .step-block{
+    border:1px solid var(--gray-border);
+    border-radius:10px;
+    padding:16px 18px 18px 18px;
+    margin:6px 0 16px 34px;
+    background:#fbfbfd;
+  }
+  .req{color:#c0392b;}
+
+  .addr-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px 14px;
+    margin-bottom:16px;
+  }
+  .addr-grid label{
+    display:block;font-size:11.5px;color:var(--muted);margin-bottom:4px;
+  }
+  .addr-grid input{
+    width:100%;padding:7px 9px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;color:#9aa1ad;
+  }
+  .addr-grid .q-select{
+    width:100%;padding:7px 9px;border:1px solid var(--gray-border);border-radius:6px;font-size:13px;color:#374151;background:#fff;
+  }
+
+  .map-label{font-size:11.5px;color:var(--muted);margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+  .map-label b{color:var(--text);font-size:12.5px;}
+
+  /* Read-only Job Site Address block (Create Quote) */
+  .qjs-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .qjs-header b{color:var(--text);font-size:13.5px;}
+  .qjs-header .qjs-open-project{color:var(--blue);cursor:pointer;font-size:12.5px;}
+  .qjs-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 30px;margin-bottom:16px;}
+  .qjs-row{display:flex;justify-content:space-between;padding:4px 0;font-size:13px;}
+  .qjs-row .lbl{color:var(--muted);}
+  .qjs-row .val{color:var(--text);}
+
+  /* ---------- Map component ---------- */
+  .map-outer{
+    position:relative; /* popover positions relative to this, and is NOT clipped */
+  }
+  .map-wrap{
+    position:relative;
+    height:360px;
+    border-radius:8px;
+    overflow:hidden; /* clips only roads/pins background, not the popover (popover lives outside this box) */
+    border:1px solid var(--gray-border);
+    background:#eef1f5;
+  }
+  .map-wrap svg.roads{position:absolute;inset:0;width:100%;height:100%;}
+  .pin{
+    position:absolute;
+    cursor:pointer;
+    transform:translate(-50%,-50%);
+    z-index:2;
+  }
+  .pin.jobsite{transform:translate(-50%,-92%);z-index:4;}
+  .pin-dot{
+    width:16px;height:16px;border-radius:50%;
+    background:#fff;
+    border:3px solid var(--green);
+    box-shadow:0 1px 3px rgba(0,0,0,.25);
+  }
+  .pin.competitor .pin-dot{border-color:var(--red);}
+  .pin.is-selected .pin-dot{
+    border-color:var(--green);
+    box-shadow:0 0 0 4px rgba(46,139,71,.28), 0 1px 3px rgba(0,0,0,.25);
+  }
+  .pin-cluster{
+    min-width:26px;height:26px;border-radius:50%;
+    background:var(--green);
+    color:#fff;
+    font-size:12px;
+    font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid #fff;
+    box-shadow:0 1px 4px rgba(0,0,0,.3);
+    padding:0 4px;
+  }
+  .pin.competitor .pin-cluster{background:var(--red);}
+  .pin-flag{
+    width:26px;height:34px;
+    display:block;
+  }
+  /* Selected-location marker: teardrop pin sitting on a ground-shadow ellipse, like a dropped map pin */
+  .pin-flag--based{
+    width:26px;height:44px;
+  }
+
+  .map-legend{
+    position:absolute;
+    top:10px;right:10px;
+    background:#fff;
+    border:1px solid var(--gray-border);
+    border-radius:8px;
+    padding:10px 12px;
+    font-size:12.5px;
+    box-shadow:0 4px 10px rgba(0,0,0,.08);
+    z-index:5;
+    min-width:170px;
+  }
+  .map-legend .lg-title{font-weight:600;margin-bottom:8px;color:var(--navy);font-size:12px;}
+  .map-legend label{display:flex;align-items:center;gap:8px;margin-bottom:6px;cursor:pointer;}
+  .map-legend label:last-child{margin-bottom:0;}
+  .swatch{width:11px;height:11px;border-radius:50%;border:2.5px solid; background:#fff; flex-shrink:0;}
+  .swatch.green{border-color:var(--green);}
+  .swatch.red{border-color:var(--red);}
+  .swatch.job{border-radius:50% 50% 50% 0;background:var(--job);border:none;transform:rotate(-45deg);width:11px;height:11px;}
+
+  .zoom-pill{
+    position:absolute;
+    top:10px; left:10px;
+    background:var(--navy);
+    color:#fff;
+    font-size:11.5px;
+    font-weight:600;
+    padding:6px 12px;
+    border-radius:20px;
+    display:none;
+    align-items:center;
+    gap:6px;
+    z-index:6;
+    cursor:pointer;
+    box-shadow:0 3px 8px rgba(0,0,0,.2);
+  }
+  .zoom-pill .reset-link{text-decoration:underline;}
+
+  /* Cluster preview popover lives inside .map-outer, a sibling of .map-wrap (which clips), so it is never cropped.
+     Its final left/top are computed and clamped in JS (see positionPopover). */
+  .popover{
+    position:absolute;
+    background:#fff;
+    border:1px solid var(--gray-border);
+    border-radius:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,.18);
+    padding:14px 16px;
+    width:270px;
+    z-index:50;
+    font-size:12.5px;
+    display:none;
+    visibility:hidden;
+  }
+  .popover.show{display:block;}
+  .popover .pop-type{
+    display:inline-block;
+    font-size:10.5px;
+    font-weight:700;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+    padding:2px 7px;
+    border-radius:4px;
+    margin-bottom:6px;
+  }
+  .pop-type.plant{background:#e7f5ea;color:var(--green);}
+  .pop-type.competitor{background:#fbe9e9;color:var(--red);}
+  .pop-type.job{background:#e5f4f9;color:#2d7c96;}
+  .popover .pop-name{font-weight:700;font-size:14px;margin-bottom:2px;color:var(--text);}
+  .popover .pop-addr{color:var(--muted);margin-bottom:8px;}
+  .pop-metrics{
+    display:flex;
+    gap:14px;
+    background:#f6f7f9;
+    border-radius:6px;
+    padding:8px 10px;
+    margin-bottom:8px;
+  }
+  .pop-metrics div{font-size:12px;white-space:nowrap;}
+  .pop-metrics b{display:block;font-size:14px;color:var(--text);}
+  .pop-extra{color:var(--muted);font-size:11.5px;}
+  .pop-close{
+    position:absolute;top:8px;right:10px;cursor:pointer;color:var(--muted);font-size:14px;border:none;background:none;
+  }
+  .cluster-list-item{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:7px 0;border-bottom:1px solid #f0f1f4;
+  }
+  .cluster-list-item:last-child{border-bottom:none;}
+  .cluster-list-item .cli-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .cluster-list-item .cli-metrics{color:#9aa1ad;white-space:nowrap;flex-shrink:0;}
+
+  .select-btn, .zoom-btn{
+    margin-top:10px;
+    width:100%;
+    padding:8px 10px;
+    border-radius:8px;
+    border:1.5px solid var(--green);
+    background:#fff;
+    color:var(--green);
+    font-size:12px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .select-btn.is-selected{
+    background:var(--green);
+    color:#fff;
+    cursor:default;
+  }
+  .select-btn.is-inherited{
+    background:var(--blue);
+    border-color:var(--blue);
+    color:#fff;
+    cursor:default;
+  }
+  .zoom-btn{
+    border-color:var(--blue);
+    color:var(--blue);
+  }
+  .pin.flag-style{transform:translate(-50%,-77.3%);}
+
+  /* Selection alert — shown under the map once a plant is picked for the project */
+  .selection-alert{
+    display:none;
+    background:#dbf0e0;
+    border-radius:10px;
+    padding:16px 18px;
+    margin-top:10px;
+    font-size:13.5px;
+  }
+  .sa-head{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+  .sa-check{
+    width:20px;height:20px;border-radius:50%;
+    border:2px solid var(--green);color:var(--green);
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;flex-shrink:0;background:#fff;
+  }
+  .sa-title{font-weight:600;color:var(--text);}
+  .sa-item{
+    display:flex;align-items:center;gap:8px;
+    padding-left:26px;color:#374151;margin-bottom:16px;font-size:13px;
+  }
+  .sa-item .sa-arrow{color:#8a9a90;font-size:13px;}
+  .sa-item .sa-name{flex:0 0 auto;}
+  .sa-item .sa-trash{cursor:pointer;color:#4a5b6b;opacity:.8;font-size:13px;}
+  .sa-item .sa-trash:hover{opacity:1;}
+  .sa-actions{display:flex;justify-content:flex-end;align-items:center;gap:12px;}
+  .sa-action{
+    display:flex;align-items:center;gap:6px;cursor:pointer;
+    color:#2e6b47;font-weight:600;font-size:12.5px;
+  }
+  .sa-divider{width:1px;height:14px;background:#a9d3b3;}
+
+  .product-preview{
+    margin:2px 0 14px 34px;
+    padding:10px 14px;
+    border:1px solid #d7ecd9;
+    background:#f3faf4;
+    border-radius:8px;
+    font-size:12.5px;
+    display:none;
+    scroll-margin-top:16px;
+  }
+  .pp-badge{
+    display:inline-block;background:var(--green);color:#fff;font-size:10.5px;font-weight:700;
+    padding:2px 8px;border-radius:10px;margin-bottom:6px;
+  }
+
+  .drawer-foot{
+    border-top:1px solid var(--gray-border);
+    padding:14px 26px;
+    display:flex;
+    gap:10px;
+    justify-content:flex-start;
+  }
+  .btn{padding:9px 20px;border-radius:20px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid var(--gray-border);background:#fff;}
+  .btn.primary{background:var(--yellow);border-color:var(--yellow);color:#3a2c00;}
+
+  /* ---------- Map + side panel (desktop) ---------- */
+  .map-panel-row{display:flex;gap:14px;align-items:stretch;}
+  .map-wrap-flex{flex:1;min-width:0;}
+  .side-panel{
+    width:340px;
+    flex-shrink:0;
+    height:360px;
+    border:1px solid var(--gray-border);
+    border-radius:8px;
+    background:#fff;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+  }
+  .panel-empty{
+    flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:20px;gap:8px;
+  }
+  .panel-empty-title{font-size:17px;font-weight:700;color:var(--navy);}
+  .panel-empty-sub{font-size:12.5px;color:var(--muted);}
+
+  .panel-header{
+    position:relative;
+    padding:16px 40px 16px 18px;
+    display:flex;align-items:center;gap:10px;
+    font-size:18px;font-weight:700;color:var(--navy);
+    flex-shrink:0;
+  }
+  .panel-header.plant{background:#e4f6ea;}
+  .panel-header.competitor{background:#fbe7ea;}
+  .panel-header.job{background:#eaf6fa;}
+  .panel-close{
+    position:absolute;top:14px;right:14px;background:none;border:none;cursor:pointer;
+    font-size:14px;color:rgba(15,23,42,.4);
+  }
+  .panel-body{padding:14px 18px 18px 18px;overflow-y:auto;flex:1;}
+  .panel-section-title{font-weight:700;color:var(--navy);font-size:13px;margin-bottom:8px;}
+  .panel-row{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:4px 0;color:var(--text);}
+  .panel-row .prl{color:var(--muted);}
+  .panel-row .prv{color:var(--text);text-align:right;}
+  .panel-divider{border-top:1px solid var(--gray-border);margin:12px 0;}
+  .panel-products-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+  .panel-products-head .panel-section-title{margin:0;}
+  .panel-count-badge{background:var(--blue);color:#fff;font-size:11px;font-weight:700;padding:2px 9px;border-radius:10px;}
+  .panel-add-btn{
+    width:24px;height:24px;border:1px solid var(--gray-border);border-radius:6px;
+    display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:14px;
+    margin-left:auto;cursor:pointer;
+  }
+  .panel-product-card{background:#f6f7f9;border-radius:8px;padding:10px 12px;margin-bottom:8px;}
+  .panel-market-chip{
+    display:inline-flex;align-items:center;gap:5px;background:#eeeafc;color:#4a3fae;
+    padding:3px 10px;border-radius:10px;font-size:11.5px;
+  }
+  /* bleed the panel header to the sheet's edges when reused inside the mobile bottom sheet */
+  .rich-sheet .panel-header{margin:-10px -18px 12px -18px;border-radius:16px 16px 0 0;padding:16px 40px 16px 18px;}
+
+  /* ---------- Mobile ---------- */
+  .phone-frame{
+    width:360px;
+    margin:0 auto;
+    border:10px solid #111;
+    border-radius:34px;
+    overflow:hidden;
+    box-shadow:0 14px 34px rgba(0,0,0,.28);
+    background:#fff;
+    position:relative;
+    height:760px;
+    display:flex;
+    flex-direction:column;
+  }
+  .phone-status{background:var(--navy);color:#fff;font-size:12px;padding:6px 16px;display:flex;justify-content:space-between;}
+  .phone-header{background:var(--navy);color:#fff;padding:10px 16px 14px 16px;font-size:16px;display:flex;align-items:center;gap:10px;}
+  .phone-body{flex:1;overflow-y:auto;padding:14px 16px 90px 16px;position:relative;}
+  .phone-stepbar{display:flex;justify-content:space-between;align-items:center;background:#eef0f5;border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:8px;}
+  .phone-stepbar .mid{font-weight:600;display:flex;align-items:center;gap:4px;}
+  .phone-dots{display:flex;justify-content:center;gap:5px;margin-bottom:16px;}
+  .phone-dots span{width:6px;height:6px;border-radius:50%;background:#d7dbe3;}
+  .phone-dots span.active{width:20px;border-radius:5px;background:#3b5bdb;}
+  .phone-field label{font-size:11.5px;color:var(--muted);display:block;margin-bottom:4px;}
+  .phone-field input{width:100%;padding:9px;border:1px solid var(--gray-border);border-radius:7px;font-size:13px;margin-bottom:14px;color:#9aa1ad;}
+  .phone-field select{width:100%;padding:9px;border:1px solid var(--gray-border);border-radius:7px;font-size:13px;margin-bottom:14px;color:#374151;background:#fff;}
+
+  .phone-map-wrap{position:relative;height:300px;border-radius:8px;overflow:hidden;border:1px solid var(--gray-border);background:#eef1f5;margin-bottom:10px;}
+  .layers-btn{
+    position:absolute;top:8px;right:8px;z-index:6;
+    background:#fff;border:1px solid var(--gray-border);border-radius:20px;
+    padding:6px 12px;font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:5px;
+    box-shadow:0 3px 8px rgba(0,0,0,.12);cursor:pointer;
+  }
+  .layers-dropdown{
+    position:absolute;top:40px;right:8px;z-index:7;
+    background:#fff;border:1px solid var(--gray-border);border-radius:8px;
+    padding:10px 12px;font-size:12.5px;box-shadow:0 6px 16px rgba(0,0,0,.15);display:none;min-width:150px;
+  }
+  .layers-dropdown.show{display:block;}
+  .layers-dropdown label{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+  .layers-dropdown label:last-child{margin-bottom:0;}
+
+  .sheet-backdrop{
+    position:absolute;inset:0;background:rgba(15,20,35,.35);z-index:29;display:none;
+  }
+  .sheet-backdrop.show{display:block;}
+  .bottom-sheet{
+    position:absolute;left:0;right:0;bottom:0;
+    background:#fff;border-radius:16px 16px 0 0;
+    padding:10px 18px 20px 18px;
+    box-shadow:0 -8px 24px rgba(0,0,0,.2);
+    transform:translateY(100%);
+    transition:transform .22s ease;
+    z-index:30;
+    font-size:13px;
+    max-height:78%;
+    overflow-y:auto;
+  }
+  .bottom-sheet.show{transform:translateY(0);}
+  .sheet-handle{width:36px;height:4px;background:#dcdfe5;border-radius:2px;margin:0 auto 12px auto;}
+
+  .phone-foot{
+    position:absolute;bottom:0;left:0;right:0;
+    background:#fff;border-top:1px solid var(--gray-border);
+    padding:10px 14px;display:flex;gap:8px;
+  }
+  .phone-foot .btn{flex:1;text-align:center;padding:9px 0;font-size:12px;}
+
+  .caption{text-align:center;color:var(--muted);font-size:12px;margin-top:12px;}
+</style>
+</head>
+<body>
+
+<div class="proto-note">
+  <b>Interaction model:</b> hover a dense cluster (desktop) or tap it (mobile) for a quick preview — name, distance and
+  drive time for each pin grouped there. Click the cluster itself, or the "Zoom in" button in that preview, to spread the
+  pins apart. Click any individual pin — job site, our plant, or a competitor — and its full details render in the panel
+  next to the map (desktop) or a bottom sheet (mobile): a colored header, Location Details (address, distance, drive time,
+  markets), and Tracked Products. Picking "Select for this project" on one of our plants marks it as the project's
+  location and pre-fills step 7, Product(s) Info.
+</div>
+
+<div class="proto-toolbar">
+  <span>View:</span>
+  <button class="view-btn active" data-view="desktop">Desktop</button>
+  <button class="view-btn" data-view="mobile">Mobile</button>
+  <span style="margin-left:18px;">Drawer:</span>
+  <button class="drawer-btn active" data-drawer="project">Create Project</button>
+  <button class="drawer-btn" data-drawer="quote">Create Quote</button>
+</div>
+
+<div class="stage">
+
+  <!-- ===================== DESKTOP ===================== -->
+  <div class="view active" id="view-desktop">
+    <div class="app-shell" id="drawer-project-desktop">
+      <div class="app-sidebar">
+        <div class="logo"></div>
+        <div class="ic"></div><div class="ic"></div><div class="ic on"></div><div class="ic"></div>
+        <div class="ic"></div><div class="ic"></div><div class="ic"></div>
+      </div>
+      <div class="app-main">
+        <h2>Projects</h2>
+        <div class="row" style="width:40%"></div>
+        <div class="row"></div><div class="row"></div><div class="row" style="width:55%"></div>
+      </div>
+      <div class="drawer">
+        <div class="drawer-head">
+          <h1>Create project</h1>
+          <span style="color:#9aa1ad;cursor:pointer;">✕</span>
+        </div>
+        <div class="drawer-body">
+          <div class="step-row"><span class="num">1</span> Project Information</div>
+          <div class="step-row"><span class="num">2</span> Additional Information</div>
+
+          <div class="step-row active" id="project-job-site-row"><span class="num">3</span> Job Site Address<span class="req">*</span></div>
+          <div class="step-block">
+            <div class="addr-grid">
+              <div><label>Line 1</label><input placeholder="Search for address"></div>
+              <div><label>Line 2</label><input></div>
+              <div><label>City</label><input></div>
+              <div><label>State*</label><input></div>
+              <div><label>Postal Code</label><input></div>
+              <div><label>County</label><input></div>
+            </div>
+
+            <div class="map-label"><b>Job Site Map</b><span>3 plants · 3 competitors nearby</span></div>
+
+            <div class="map-panel-row">
+              <div class="map-outer map-wrap-flex" id="map-outer-desktop">
+                <div class="map-wrap" id="map-desktop">
+                  <svg class="roads" viewBox="0 0 600 360" preserveAspectRatio="none">
+                    <line x1="0" y1="80" x2="600" y2="60" stroke="#dfe3ea" stroke-width="3"/>
+                    <line x1="0" y1="200" x2="600" y2="230" stroke="#dfe3ea" stroke-width="3"/>
+                    <line x1="90" y1="0" x2="60" y2="360" stroke="#dfe3ea" stroke-width="3"/>
+                    <line x1="320" y1="0" x2="360" y2="360" stroke="#dfe3ea" stroke-width="3"/>
+                    <line x1="460" y1="0" x2="500" y2="360" stroke="#dfe3ea" stroke-width="3"/>
+                    <line x1="0" y1="300" x2="600" y2="300" stroke="#e6e9ee" stroke-width="2"/>
+                  </svg>
+
+                  <div class="zoom-pill" id="zoom-pill-desktop">🔍 Zoomed in — <span class="reset-link">reset view</span></div>
+
+                  <div class="map-legend">
+                    <div class="lg-title">Display Pins</div>
+                    <label><span class="swatch job"></span>Job Site</label>
+                    <label><input type="checkbox" class="toggle-plant" checked><span class="swatch green"></span>Our Plants</label>
+                    <label><input type="checkbox" class="toggle-competitor" checked><span class="swatch red"></span>Competitors</label>
+                  </div>
+                </div>
+
+                <div class="popover" id="pop-desktop">
+                  <button class="pop-close">✕</button>
+                  <div class="pop-body"></div>
+                </div>
+              </div>
+
+              <div class="side-panel" id="side-panel-desktop"></div>
+            </div>
+
+            <div class="selection-alert" id="selection-alert-desktop">
+              <div class="sa-head"><span class="sa-check">✓</span><span class="sa-title">1 Selected location for this project</span></div>
+              <div class="sa-item"><span class="sa-arrow">↳</span><span class="sa-name"></span><span class="sa-trash" title="Remove">🗑</span></div>
+              <div class="sa-actions">
+                <span class="sa-action sa-delete-all">🗑 Delete All</span>
+                <span class="sa-divider"></span>
+                <span class="sa-action sa-goto">Go To Product(S) Info ↗</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-row"><span class="num">4</span> Project Config</div>
+          <div class="step-row"><span class="num">5</span> Buyers</div>
+          <div class="step-row"><span class="num">6</span> Other Companies</div>
+          <div class="step-row"><span class="num">7</span> Product(s) Info</div>
+          <div class="product-preview" id="product-preview-desktop">
+            <span class="pp-badge">Pre-filled from map</span>
+            <div class="pp-text"><b id="pp-plant-name-desktop"></b> is already selected as this project's location — choose products for this location below.</div>
+          </div>
+          <div class="step-row" style="color:#b8bec9;"><span class="num" style="border-color:#c9cdd6;color:#c9cdd6;">8</span> Competitors <span style="font-size:11px;color:#c9cdd6;margin-left:4px;">(doesn't exist yet)</span></div>
+          <div class="step-row"><span class="num">9</span> Details</div>
+          <div class="step-row"><span class="num">10</span> Forecasts</div>
+          <div class="step-row"><span class="num">11</span> Attached Files</div>
+          <div class="step-row"><span class="num">12</span> Terms</div>
+          <div class="step-row"><span class="num">13</span> Notes</div>
+        </div>
+        <div class="drawer-foot">
+          <button class="btn">CANCEL</button>
+          <button class="btn">RESET</button>
+          <button class="btn primary">SAVE</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= CREATE QUOTE DRAWER ================= -->
+    <div class="app-shell" id="drawer-quote-desktop" style="display:none;">
+      <div class="app-sidebar">
+        <div class="logo"></div>
+        <div class="ic"></div><div class="ic"></div><div class="ic"></div><div class="ic on"></div>
+        <div class="ic"></div><div class="ic"></div><div class="ic"></div>
+      </div>
+      <div class="app-main">
+        <h2>Quotes</h2>
+        <div class="row" style="width:40%"></div>
+        <div class="row"></div><div class="row"></div><div class="row" style="width:55%"></div>
+      </div>
+      <div class="drawer">
+        <div class="drawer-head">
+          <h1>Create quote</h1>
+          <span style="color:#9aa1ad;cursor:pointer;">✕</span>
+        </div>
+        <div class="drawer-body">
+          <div class="step-row active step-clickable" id="quote-info-row"><span class="num">1</span> Quote Information<span class="req">*</span></div>
+          <div class="step-block" id="quote-info-block">
+            <div class="addr-grid">
+              <div><label>Name</label><input id="q-name" placeholder=""></div>
+              <div><label>Revision</label><input value="1" disabled style="background:#f4f5f7;color:#9aa1ad;"></div>
+              <div><label>Creation Date</label><input id="q-creation-date" placeholder="mm/dd/yyyy"></div>
+              <div><label>Revision Date</label><input id="q-revision-date" placeholder="mm/dd/yyyy"></div>
+              <div><label>Expiration Date</label><input id="q-expiration-date" placeholder="mm/dd/yyyy"></div>
+              <div>
+                <label>Status*</label>
+                <select id="q-status" class="q-select">
+                  <option value="">Not selected</option>
+                  <option value="Draft">Draft</option>
+                  <option value="Sent">Sent</option>
+                  <option value="Won">Won</option>
+                  <option value="Lost">Lost</option>
+                </select>
+              </div>
+              <div>
+                <label>Salesperson*</label>
+                <select id="q-salesperson" class="q-select">
+                  <option value="">Not selected</option>
+                  <option value="John Oliver">John Oliver</option>
+                  <option value="Jane Smith">Jane Smith</option>
+                </select>
+              </div>
+              <div>
+                <label>Project*</label>
+                <select id="q-project" class="q-select">
+                  <option value="">Not selected</option>
+                  <option value="amazon-charlotte">Amazon Warehouse – Charlotte</option>
+                </select>
+              </div>
+              <div><label>Configuration Template</label><input placeholder="Not selected" disabled style="background:#f4f5f7;color:#9aa1ad;"></div>
+            </div>
+
+            <div id="quote-job-site-block" style="display:none;">
+              <div class="qjs-header">
+                <b>Job Site Address</b>
+                <span class="qjs-open-project">Open Project To Change Job Site Address ↗</span>
+              </div>
+              <div class="qjs-grid">
+                <div class="qjs-row"><span class="lbl">Address Line 1:</span><span class="val">68 Mcallister St, San Francisco, CA, USA</span></div>
+                <div class="qjs-row"><span class="lbl">Postal Code:</span><span class="val">90001</span></div>
+                <div class="qjs-row"><span class="lbl">Line 2:</span><span class="val">Not Set</span></div>
+                <div class="qjs-row"><span class="lbl">Country:</span><span class="val">USA</span></div>
+                <div class="qjs-row"><span class="lbl">City:</span><span class="val">San Francisco</span></div>
+                <div class="qjs-row"><span class="lbl">Latitude:</span><span class="val">37.7809</span></div>
+                <div class="qjs-row"><span class="lbl">State:</span><span class="val">California</span></div>
+                <div class="qjs-row"><span class="lbl">Longitude:</span><span class="val">-122.4292</span></div>
+              </div>
+
+              <div class="map-panel-row">
+                <div class="map-outer map-wrap-flex" id="map-outer-quote">
+                  <div class="map-wrap" id="map-quote">
+                    <svg class="roads" viewBox="0 0 600 360" preserveAspectRatio="none">
+                      <line x1="0" y1="80" x2="600" y2="60" stroke="#dfe3ea" stroke-width="3"/>
+                      <line x1="0" y1="200" x2="600" y2="230" stroke="#dfe3ea" stroke-width="3"/>
+                      <line x1="90" y1="0" x2="60" y2="360" stroke="#dfe3ea" stroke-width="3"/>
+                      <line x1="320" y1="0" x2="360" y2="360" stroke="#dfe3ea" stroke-width="3"/>
+                      <line x1="460" y1="0" x2="500" y2="360" stroke="#dfe3ea" stroke-width="3"/>
+                      <line x1="0" y1="300" x2="600" y2="300" stroke="#e6e9ee" stroke-width="2"/>
+                    </svg>
+
+                    <div class="zoom-pill" id="zoom-pill-quote">🔍 Zoomed in — <span class="reset-link">reset view</span></div>
+
+                    <div class="map-legend">
+                      <div class="lg-title">Display Pins</div>
+                      <label><span class="swatch job"></span>Job Site</label>
+                      <label><input type="checkbox" class="toggle-plant-quote" checked><span class="swatch green"></span>Our Plants</label>
+                      <label><input type="checkbox" class="toggle-competitor-quote" checked><span class="swatch red"></span>Competitors</label>
+                    </div>
+                  </div>
+
+                  <div class="popover" id="pop-quote">
+                    <button class="pop-close">✕</button>
+                    <div class="pop-body"></div>
+                  </div>
+                </div>
+
+                <div class="side-panel" id="side-panel-quote"></div>
+              </div>
+
+              <div class="selection-alert" id="selection-alert-quote"></div>
+            </div>
+          </div>
+
+          <div class="step-row step-clickable" id="quote-product-info-row"><span class="num">2</span> Product(s) Info</div>
+          <div class="step-block" id="quote-product-info-block" style="display:none;">
+            <div style="color:var(--muted);font-size:13px;padding:6px 0 16px;">Product selection for the location(s) chosen above would appear here.</div>
+          </div>
+          <div class="step-row"><span class="num">3</span> Buyer Information</div>
+          <div class="step-row"><span class="num">4</span> Additional Services</div>
+          <div class="step-row"><span class="num">5</span> Product Restrictions</div>
+          <div class="step-row"><span class="num">6</span> Price Escalations</div>
+          <div class="step-row"><span class="num">7</span> Attached Files</div>
+          <div class="step-row"><span class="num">8</span> Terms/T&amp;C</div>
+          <div class="step-row"><span class="num">9</span> Notes (Internal Only)</div>
+        </div>
+        <div class="drawer-foot">
+          <button class="btn">CANCEL</button>
+          <button class="btn">RESET</button>
+          <button class="btn primary">SAVE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== MOBILE ===================== -->
+  <div class="view" id="view-mobile">
+    <div class="mobile-note">
+      <span class="mn-icon">⚠️</span>
+      <span><b>No hover on mobile.</b> Unlike desktop, tapping a grouped pin does not show a preview — the map instantly zooms in and spreads the group into individual pins. Tapping an individual pin opens its full details drawer.</span>
+    </div>
+    <div id="mobile-project-wrap">
+    <div class="phone-frame">
+      <div class="phone-status"><span>9:41</span><span>••• 🔋</span></div>
+      <div class="phone-header">‹ &nbsp; Create Project</div>
+      <div class="phone-body">
+        <div class="phone-stepbar">
+          <span style="color:#3b5bdb;">Back</span>
+          <span class="mid">Job Site Address* ⌄</span>
+          <span style="color:#3b5bdb;">Next</span>
+        </div>
+        <div class="phone-dots">
+          <span></span><span></span><span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span>
+        </div>
+
+        <div class="phone-field">
+          <label>Address Line 1</label>
+          <input placeholder="Search for address">
+        </div>
+
+        <div class="phone-map-wrap" id="map-mobile">
+          <svg class="roads" viewBox="0 0 340 300" preserveAspectRatio="none">
+            <line x1="0" y1="60" x2="340" y2="40" stroke="#dfe3ea" stroke-width="3"/>
+            <line x1="0" y1="170" x2="340" y2="190" stroke="#dfe3ea" stroke-width="3"/>
+            <line x1="60" y1="0" x2="40" y2="300" stroke="#dfe3ea" stroke-width="3"/>
+            <line x1="230" y1="0" x2="260" y2="300" stroke="#dfe3ea" stroke-width="3"/>
+            <line x1="0" y1="250" x2="340" y2="250" stroke="#e6e9ee" stroke-width="2"/>
+          </svg>
+
+          <div class="zoom-pill" id="zoom-pill-mobile">🔍 Zoomed in — <span class="reset-link">reset view</span></div>
+
+          <div class="layers-btn" id="layers-btn">⚙ Layers</div>
+          <div class="layers-dropdown" id="layers-dropdown">
+            <label><span class="swatch job"></span>Job Site</label>
+            <label><input type="checkbox" class="toggle-plant-m" checked><span class="swatch green"></span>Our Plants</label>
+            <label><input type="checkbox" class="toggle-competitor-m" checked><span class="swatch red"></span>Competitors</label>
+          </div>
+        </div>
+
+        <div class="selection-alert" id="selection-alert-mobile">
+          <div class="sa-head"><span class="sa-check">✓</span><span class="sa-title">1 Selected location for this project</span></div>
+          <div class="sa-item"><span class="sa-arrow">↳</span><span class="sa-name"></span><span class="sa-trash" title="Remove">🗑</span></div>
+          <div class="sa-actions">
+            <span class="sa-action sa-delete-all">🗑 Delete All</span>
+          </div>
+        </div>
+      </div>
+      <div class="phone-foot">
+        <button class="btn">CANCEL</button>
+        <button class="btn">RESET</button>
+        <button class="btn primary">SAVE</button>
+      </div>
+
+      <!-- Detail drawer overlays the whole screen (form + map), not just the map box -->
+      <div class="sheet-backdrop" id="sheet-backdrop"></div>
+      <div class="bottom-sheet" id="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <div class="pop-body rich-sheet" id="sheet-body"></div>
+      </div>
+    </div>
+    <div class="caption">Tap an individual pin to open its full details drawer. Tap a cluster to zoom in and spread the pins apart automatically.</div>
+    </div>
+
+    <div id="mobile-quote-wrap" style="display:none;">
+      <div class="phone-frame">
+        <div class="phone-status"><span>9:41</span><span>••• 🔋</span></div>
+        <div class="phone-header">‹ &nbsp; Create Quote</div>
+        <div class="phone-body">
+          <div class="phone-stepbar">
+            <span style="color:#3b5bdb;">Back</span>
+            <span class="mid" id="phone-stepbar-quote-label">Quote Information* ⌄</span>
+            <span style="color:#3b5bdb;">Next</span>
+          </div>
+          <div class="phone-dots" id="phone-dots-quote">
+            <span class="active"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+
+          <div id="phone-quote-info-block">
+            <div class="phone-field"><label>Name</label><input id="qm-name" placeholder=""></div>
+            <div class="phone-field">
+              <label>Status*</label>
+              <select id="qm-status">
+                <option value="">Not selected</option>
+                <option value="Draft">Draft</option>
+                <option value="Sent">Sent</option>
+                <option value="Won">Won</option>
+                <option value="Lost">Lost</option>
+              </select>
+            </div>
+            <div class="phone-field">
+              <label>Salesperson*</label>
+              <select id="qm-salesperson">
+                <option value="">Not selected</option>
+                <option value="John Oliver">John Oliver</option>
+                <option value="Jane Smith">Jane Smith</option>
+              </select>
+            </div>
+            <div class="phone-field">
+              <label>Project*</label>
+              <select id="qm-project">
+                <option value="">Not selected</option>
+                <option value="amazon-charlotte">Amazon Warehouse – Charlotte</option>
+              </select>
+            </div>
+
+            <div id="quote-job-site-block-m" style="display:none;">
+              <div class="qjs-header">
+                <b>Job Site Address</b>
+                <span class="qjs-open-project">Open Project To Change Job Site Address ↗</span>
+              </div>
+              <div class="qjs-grid" style="grid-template-columns:1fr;">
+                <div class="qjs-row"><span class="lbl">Address Line 1:</span><span class="val">68 Mcallister St, San Francisco, CA, USA</span></div>
+                <div class="qjs-row"><span class="lbl">City:</span><span class="val">San Francisco</span></div>
+                <div class="qjs-row"><span class="lbl">State:</span><span class="val">California</span></div>
+                <div class="qjs-row"><span class="lbl">Postal Code:</span><span class="val">90001</span></div>
+              </div>
+
+              <div class="phone-map-wrap" id="map-quote-m">
+                <svg class="roads" viewBox="0 0 340 300" preserveAspectRatio="none">
+                  <line x1="0" y1="60" x2="340" y2="40" stroke="#dfe3ea" stroke-width="3"/>
+                  <line x1="0" y1="170" x2="340" y2="190" stroke="#dfe3ea" stroke-width="3"/>
+                  <line x1="60" y1="0" x2="40" y2="300" stroke="#dfe3ea" stroke-width="3"/>
+                  <line x1="230" y1="0" x2="260" y2="300" stroke="#dfe3ea" stroke-width="3"/>
+                  <line x1="0" y1="250" x2="340" y2="250" stroke="#e6e9ee" stroke-width="2"/>
+                </svg>
+
+                <div class="zoom-pill" id="zoom-pill-quote-m">🔍 Zoomed in — <span class="reset-link">reset view</span></div>
+
+                <div class="layers-btn" id="layers-btn-quote-m">⚙ Layers</div>
+                <div class="layers-dropdown" id="layers-dropdown-quote-m">
+                  <label><span class="swatch job"></span>Job Site</label>
+                  <label><input type="checkbox" class="toggle-plant-qm" checked><span class="swatch green"></span>Our Plants</label>
+                  <label><input type="checkbox" class="toggle-competitor-qm" checked><span class="swatch red"></span>Competitors</label>
+                </div>
+              </div>
+
+              <div class="selection-alert" id="selection-alert-quote-m"></div>
+            </div>
+          </div>
+
+          <div id="phone-quote-product-block" style="display:none;">
+            <div style="color:var(--muted);font-size:13px;padding:10px 0;">Product selection for the location(s) chosen above would appear here.</div>
+          </div>
+        </div>
+        <div class="phone-foot">
+          <button class="btn">CANCEL</button>
+          <button class="btn">RESET</button>
+          <button class="btn primary">SAVE</button>
+        </div>
+
+        <!-- Detail drawer overlays the whole screen, matching the Create Project mobile pattern -->
+        <div class="sheet-backdrop" id="sheet-backdrop-quote-m"></div>
+        <div class="bottom-sheet" id="bottom-sheet-quote-m">
+          <div class="sheet-handle"></div>
+          <div class="pop-body rich-sheet" id="sheet-body-quote-m"></div>
+        </div>
+      </div>
+      <div class="caption">Select a Project to reveal its Job Site Address and map. Tap a cluster to zoom in; tap an individual pin to open its details drawer and add it to the quote.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ---------------- Data ----------------
+// Coordinates are percentages of the map container (0-100).
+const jobSite = { name: "Job Site", address: "412 Colas Way, Denver, CO" };
+
+const plants = [
+  { name: "Slabstack RMX — Mitchell Plant", address: "3201 Mitchell Rd", x: 30, y: 32, dist: "3.2 mi", time: "7 min",
+    extra: "Ready Mix, Aggregates",
+    products: [
+      { name: "10mm Aggregate", unitPrice: 120, listPrice: 125, suggestedPrice: 122, unitCost: 108 },
+      { name: "3/8 Coarse Aggregate", unitPrice: 17, listPrice: 18, suggestedPrice: 17.5, unitCost: 14.2 },
+      { name: "3000 PSI ABCD", unitPrice: 136.43, listPrice: 140, suggestedPrice: 138, unitCost: 121.6 }
+    ] },
+  { name: "Slabstack RMX — North Yard", address: "980 Foothills Pkwy", x: 34, y: 38, dist: "3.6 mi", time: "8 min",
+    extra: "Aggregates",
+    products: [
+      { name: "3/4 Crushed Stone", unitPrice: 22, listPrice: 23.5, suggestedPrice: 22.8, unitCost: 18.4 },
+      { name: "Road Base", unitPrice: 14, listPrice: 15, suggestedPrice: 14.5, unitCost: 11.9 }
+    ] },
+  { name: "Slabstack RMX — East Plant", address: "77 Airport Blvd", x: 78, y: 66, dist: "11.4 mi", time: "19 min",
+    extra: "Asphalt",
+    products: [
+      { name: "HMA Surface Mix", unitPrice: 68, listPrice: 72, suggestedPrice: 70, unitCost: 59 },
+      { name: "HMA Base Mix", unitPrice: 61, listPrice: 64, suggestedPrice: 62.5, unitCost: 53 }
+    ] },
+];
+
+const competitors = [
+  { name: "PlantXYZ", address: "3625 E Monument St", x: 60, y: 26, dist: "5.8 mi", time: "12 min",
+    extra: "Last known 10mm Aggregate: $120.00", markets: "Central",
+    products: [
+      { name: "10mm Aggregate", lastKnownPrice: 120 },
+      { name: "3/8 Coarse Aggregate", lastKnownPrice: 17 },
+      { name: "3000 PSI ABCD", lastKnownPrice: 136.43 },
+      { name: "3500 PSI w/ Fiber", lastKnownPrice: 169.04 }
+    ] },
+  { name: "PlantXYZ — Satellite", address: "3640 E Monument St", x: 63, y: 29, dist: "6.0 mi", time: "12 min",
+    extra: "Last known 3/8 Coarse Agg: $17.00", markets: "Central",
+    products: [
+      { name: "3/8 Coarse Aggregate", lastKnownPrice: 17.5 },
+      { name: "Road Base", lastKnownPrice: 15.2 }
+    ] },
+  { name: "Vulcan North", address: "12 Riverside Dr", x: 16, y: 70, dist: "9.1 mi", time: "16 min",
+    extra: "Last known Ready Mix: $136.43", markets: "North",
+    products: [
+      { name: "Ready Mix", lastKnownPrice: 136.43 },
+      { name: "Pea Gravel", lastKnownPrice: 19.8 }
+    ] },
+];
+
+// ---------------- View switch ----------------
+document.querySelectorAll('.view-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+    document.getElementById('view-'+btn.dataset.view).classList.add('active');
+  });
+});
+
+// ---------------- Helpers ----------------
+function clampPct(v){ return Math.max(4, Math.min(96, v)); }
+
+// Groups pins that are within `thresholdPx` of each other. `overrides` (name -> {x,y}) lets us
+// force previously-clustered pins apart after a "zoom in" action.
+function clusterPins(items, wPx, hPx, thresholdPx, overrides){
+  const pts = items.map(it=>{
+    const o = overrides[it.name];
+    const ex = o ? o.x : it.x;
+    const ey = o ? o.y : it.y;
+    return {...it, ex, ey, px: ex/100*wPx, py: ey/100*hPx, used:false};
+  });
+  const clusters = [];
+  for(let i=0;i<pts.length;i++){
+    if(pts[i].used) continue;
+    const group = [pts[i]];
+    pts[i].used = true;
+    for(let j=i+1;j<pts.length;j++){
+      if(pts[j].used) continue;
+      const dx = pts[i].px - pts[j].px, dy = pts[i].py - pts[j].py;
+      if(Math.sqrt(dx*dx+dy*dy) < thresholdPx){
+        group.push(pts[j]);
+        pts[j].used = true;
+      }
+    }
+    clusters.push(group);
+  }
+  return clusters;
+}
+
+// "Zoom in": spreads a clustered group's pins around their shared centroid so each renders individually.
+function expandGroup(overrides, group){
+  const cx = group.reduce((s,p)=>s+p.ex,0)/group.length;
+  const cy = group.reduce((s,p)=>s+p.ey,0)/group.length;
+  const radius = 9;
+  group.forEach((it,i)=>{
+    const angle = (2*Math.PI*i)/group.length - Math.PI/2;
+    overrides[it.name] = {
+      x: clampPct(cx + radius*Math.cos(angle)),
+      y: clampPct(cy + radius*Math.sin(angle))
+    };
+  });
+}
+
+// ---------------- Renderer ----------------
+function wirePin(el, sel, mode, onHover, onHoverEnd, onClusterClick, isCluster){
+  if(mode === 'mixed'){
+    // A dense cluster behaves like a classic map: hover shows a quick preview popover, click is a
+    // shortcut to zoom in. An individual pin only reacts to a click, which opens the side panel.
+    if(isCluster){
+      el.addEventListener('mouseenter', (e)=>{ e.stopPropagation(); onHover(sel); });
+      el.addEventListener('mouseleave', (e)=>{ e.stopPropagation(); onHoverEnd(); });
+      if(onClusterClick){
+        el.addEventListener('click', (e)=>{ e.stopPropagation(); onClusterClick(); });
+      }
+    } else {
+      el.addEventListener('click', (e)=>{ e.stopPropagation(); onHover(sel); });
+    }
+  } else if(mode === 'tap-direct'){
+    // Mobile: there is no "here's what's grouped" preview state. Tapping a cluster zooms in and
+    // spreads the pins apart immediately; tapping an individual pin opens its detail drawer.
+    if(isCluster && onClusterClick){
+      el.addEventListener('click', (e)=>{ e.stopPropagation(); onClusterClick(); });
+    } else {
+      el.addEventListener('click', (e)=>{ e.stopPropagation(); onHover(sel); });
+    }
+  } else {
+    el.addEventListener('click', (e)=>{ e.stopPropagation(); onHover(sel); });
+  }
+}
+
+function renderMap(cfg){
+  const { mapEl, wPx, hPx, threshold, showPlant, showCompetitor, overrides, selectedPlantName,
+          selectedPlantNames, mode, onHover, onHoverEnd, onClusterClick } = cfg;
+  mapEl.querySelectorAll('.pin').forEach(p=>p.remove());
+
+  // job site pin (always visible)
+  const js = document.createElement('div');
+  js.className = 'pin jobsite';
+  js.style.left = '50%'; js.style.top = '50%';
+  js.innerHTML = `<svg class="pin-flag" viewBox="0 0 26 34"><path d="M13 0C5.82 0 0 5.82 0 13c0 9.7 13 21 13 21s13-11.3 13-21C26 5.82 20.18 0 13 0z" fill="#4bacce"/><circle cx="13" cy="13" r="6.2" fill="#fff"/></svg>`;
+  wirePin(js, {type:'job', x:50, y:50}, mode, onHover, onHoverEnd, null, false);
+  mapEl.appendChild(js);
+
+  if(showPlant){
+    clusterPins(plants, wPx, hPx, threshold, overrides).forEach(group=>{
+      const el = document.createElement('div');
+      el.className = 'pin';
+      el.style.left = group[0].ex+'%'; el.style.top = group[0].ey+'%';
+      if(group.length > 1){
+        el.innerHTML = `<div class="pin-cluster">${group.length}</div>`;
+        wirePin(el, {type:'cluster-plant', items:group, x:group[0].ex, y:group[0].ey}, mode, onHover, onHoverEnd, ()=>onClusterClick(group), true);
+      } else {
+        const name = group[0].name;
+        const isMultiSelected = Array.isArray(selectedPlantNames) && selectedPlantNames.includes(name);
+        const isSingleSelected = !Array.isArray(selectedPlantNames) && name === selectedPlantName;
+        if(isMultiSelected || isSingleSelected){
+          // Selected locations (single-select in Create Project, multi-select in Create Quote) render
+          // as a solid green teardrop pin sitting on a ground-shadow ellipse, like a dropped map pin.
+          el.classList.add('flag-style');
+          el.innerHTML = `<svg class="pin-flag pin-flag--based" viewBox="0 0 26 44">
+              <ellipse cx="13" cy="38.5" rx="9" ry="4" fill="#fff" stroke="#2e8b47" stroke-width="1.6"/>
+              <path d="M13 0C5.82 0 0 5.82 0 13c0 9.7 13 21 13 21s13-11.3 13-21C26 5.82 20.18 0 13 0z" fill="#2e8b47"/>
+              <circle cx="13" cy="13" r="6.2" fill="#fff"/>
+            </svg>`;
+        } else {
+          el.innerHTML = `<div class="pin-dot"></div>`;
+        }
+        wirePin(el, {type:'plant', item:group[0], x:group[0].ex, y:group[0].ey}, mode, onHover, onHoverEnd, null, false);
+      }
+      mapEl.appendChild(el);
+    });
+  }
+
+  if(showCompetitor){
+    clusterPins(competitors, wPx, hPx, threshold, overrides).forEach(group=>{
+      const el = document.createElement('div');
+      el.className = 'pin competitor';
+      el.style.left = group[0].ex+'%'; el.style.top = group[0].ey+'%';
+      if(group.length > 1){
+        el.innerHTML = `<div class="pin-cluster">${group.length}</div>`;
+        wirePin(el, {type:'cluster-competitor', items:group, x:group[0].ex, y:group[0].ey}, mode, onHover, onHoverEnd, ()=>onClusterClick(group), true);
+      } else {
+        el.innerHTML = `<div class="pin-dot"></div>`;
+        wirePin(el, {type:'competitor', item:group[0], x:group[0].ex, y:group[0].ey}, mode, onHover, onHoverEnd, null, false);
+      }
+      mapEl.appendChild(el);
+    });
+  }
+}
+
+// ---------------- Cluster preview content (popover on desktop, bottom sheet on mobile) ----------------
+function popoverBody(sel){
+  // clusters only — quick preview; individual detail (and, for plants, selection) happens after zooming in.
+  const label = sel.type === 'cluster-plant' ? 'Our Plants' : 'Competitors';
+  const cls = sel.type === 'cluster-plant' ? 'plant' : 'competitor';
+  let rows = sel.items.map(it=>`<div class="cluster-list-item"><span class="cli-name">${it.name}</span><span class="cli-metrics">${it.dist} · ${it.time}</span></div>`).join('');
+  return `<div class="pop-type ${cls}">${label} nearby (${sel.items.length})</div>${rows}
+    <div class="pop-extra" style="margin:6px 0 10px 0;">Pins are grouped in this dense area.</div>
+    <button class="zoom-btn">Zoom in to see these separately</button>`;
+}
+
+function renderClusterPreviewInto(bodyEl, sel, onExpand){
+  bodyEl.innerHTML = popoverBody(sel);
+  const zoomBtn = bodyEl.querySelector('.zoom-btn');
+  if(zoomBtn) zoomBtn.addEventListener('click', ()=> onExpand(sel.items));
+}
+
+function positionPopover(popEl, containerEl, sel){
+  popEl.classList.add('show');
+  popEl.style.visibility = 'hidden';
+  popEl.style.left = '0px';
+  popEl.style.top = '0px';
+
+  const cRect = containerEl.getBoundingClientRect();
+  const pw = popEl.offsetWidth;
+  const ph = popEl.offsetHeight;
+  const anchorX = (sel.x / 100) * cRect.width;
+  const anchorY = (sel.y / 100) * cRect.height;
+  const margin = 10;
+
+  let left = anchorX + 18;
+  if(left + pw > cRect.width - margin) left = anchorX - pw - 18;
+  left = Math.max(margin, Math.min(left, cRect.width - pw - margin));
+
+  let top = anchorY - ph / 2;
+  top = Math.max(margin, Math.min(top, cRect.height - ph - margin));
+
+  popEl.style.left = left + 'px';
+  popEl.style.top = top + 'px';
+  popEl.style.visibility = 'visible';
+}
+
+// ---------------- Rich detail content (side panel on desktop, bottom sheet on mobile) ----------------
+function renderPanelEmpty(el){
+  el.innerHTML = `<div class="panel-empty">
+    <svg width="52" height="66" viewBox="0 0 26 34" fill="none">
+      <path d="M13 1.5C6.6 1.5 1.5 6.6 1.5 13c0 8.6 11.5 18.7 11.5 18.7S24.5 21.6 24.5 13C24.5 6.6 19.4 1.5 13 1.5z" stroke="#3b5bdb" stroke-width="2.2"/>
+      <circle cx="13" cy="13" r="5" fill="#e4e7f5"/>
+      <circle cx="13" cy="13" r="2.3" fill="#b9c0ea"/>
+    </svg>
+    <div class="panel-empty-title">Location details</div>
+    <div class="panel-empty-sub">Click a pin to see details</div>
+  </div>`;
+}
+
+// Supports both the Project drawer's single selection (ctx.selectedPlantName, a string) and the
+// Quote drawer's multi-selection (ctx.selectedPlantNames, an array).
+function isPlantSelected(ctx, name){
+  if(Array.isArray(ctx.selectedPlantNames)) return ctx.selectedPlantNames.includes(name);
+  return ctx.selectedPlantName === name;
+}
+
+function richDetailHTML(sel, ctx, opts){
+  opts = opts || {};
+  const closeBtn = opts.showClose ? `<button class="panel-close">✕</button>` : '';
+  if(sel.type === 'job'){
+    return `<div class="panel-header job">${closeBtn}
+        <svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="#2d7c96" stroke-width="2.4"/><circle cx="10" cy="10" r="2.6" fill="#2d7c96"/></svg>
+        Job Site
+      </div>
+      <div class="panel-body">
+        <div class="panel-section-title">Location Details</div>
+        <div class="panel-row"><span class="prl">Name:</span><span class="prv">${jobSite.name}</span></div>
+        <div class="panel-row"><span class="prl">Address:</span><span class="prv">${jobSite.address}</span></div>
+      </div>`;
+  }
+
+  const it = sel.item;
+  const isPlant = sel.type === 'plant';
+  const headerClass = isPlant ? 'plant' : 'competitor';
+  const headerTitle = isPlant ? 'Our Location' : 'Competitor Location';
+  const iconColor = isPlant ? '#2e8b47' : '#d64545';
+  const marketsRow = (!isPlant && it.markets)
+    ? `<div class="panel-row"><span class="prl">Markets:</span><span class="prv"><span class="panel-market-chip">◎ ${it.markets}</span></span></div>`
+    : '';
+  const isSel = isPlant && isPlantSelected(ctx, it.name);
+  const isInherited = isSel && ctx.isInherited && ctx.isInherited(it.name);
+  const selectBtnClass = isInherited ? 'is-inherited' : (isSel ? 'is-selected' : '');
+  const selectBtnLabel = isSel
+    ? (isInherited ? (ctx.inheritedLabel || ctx.selectedLabel || '✓ Selected for this project') : (ctx.selectedLabel || '✓ Selected for this project'))
+    : (ctx.selectLabel || 'Select for this project');
+  const selectBtn = isPlant
+    ? `<button class="select-btn ${selectBtnClass}" style="margin-top:12px;">${selectBtnLabel}</button>`
+    : '';
+  const addBtn = isPlant ? '' : `<div class="panel-add-btn">+</div>`;
+  const rows = isPlant
+    ? it.products.map(p=>`<div class="panel-product-card">
+        <div class="panel-row"><span class="prl">Name:</span><span class="prv">${p.name}</span></div>
+        <div class="panel-row"><span class="prl">Unit Price:</span><span class="prv">$${p.unitPrice.toFixed(2)}</span></div>
+        <div class="panel-row"><span class="prl">List Price:</span><span class="prv">$${p.listPrice.toFixed(2)}</span></div>
+        <div class="panel-row"><span class="prl">Suggested Price:</span><span class="prv">$${p.suggestedPrice.toFixed(2)}</span></div>
+        <div class="panel-row"><span class="prl">Unit Cost:</span><span class="prv">$${p.unitCost.toFixed(2)}</span></div>
+      </div>`).join('')
+    : it.products.map(p=>`<div class="panel-product-card">
+        <div class="panel-row"><span class="prl">Name:</span><span class="prv">${p.name}</span></div>
+        <div class="panel-row"><span class="prl">Last Known Price:</span><span class="prv">$${p.lastKnownPrice.toFixed(2)}</span></div>
+      </div>`).join('');
+
+  return `<div class="panel-header ${headerClass}">${closeBtn}
+      <svg width="18" height="18" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="none" stroke="${iconColor}" stroke-width="2.4"/><circle cx="10" cy="10" r="2.6" fill="${iconColor}"/></svg>
+      ${headerTitle}
+    </div>
+    <div class="panel-body">
+      <div class="panel-section-title">Location Details</div>
+      <div class="panel-row"><span class="prl">Name:</span><span class="prv">${it.name}</span></div>
+      <div class="panel-row"><span class="prl">Address:</span><span class="prv">${it.address}</span></div>
+      <div class="panel-row"><span class="prl">Distance:</span><span class="prv">${it.dist}</span></div>
+      <div class="panel-row"><span class="prl">Drive time:</span><span class="prv">${it.time}</span></div>
+      ${marketsRow}
+      ${selectBtn}
+      <div class="panel-divider"></div>
+      <div class="panel-products-head">
+        <span class="panel-section-title">Tracked Products</span>
+        <span class="panel-count-badge">${it.products.length}</span>
+        ${addBtn}
+      </div>
+      ${rows}
+    </div>`;
+}
+
+// Dispatches into the same detail surface: clusters show the compact list + "Zoom in";
+// job/plant/competitor pins show the full rich detail.
+function renderRichPopoverInto(el, sel, ctx, opts){
+  if(sel.type === 'cluster-plant' || sel.type === 'cluster-competitor'){
+    renderClusterPreviewInto(el, sel, ctx.onExpand);
+    return;
+  }
+  el.innerHTML = richDetailHTML(sel, ctx, opts);
+  const selectBtn = el.querySelector('.select-btn');
+  if(selectBtn && !selectBtn.classList.contains('is-selected') && !selectBtn.classList.contains('is-inherited')){
+    selectBtn.addEventListener('click', ()=> ctx.onSelectPlant(sel.item.name));
+  }
+  const closeBtn = el.querySelector('.panel-close');
+  if(closeBtn && ctx.onClose) closeBtn.addEventListener('click', ctx.onClose);
+}
+
+// ==================================================================
+// Desktop — click a pin, details render in the side panel
+// ==================================================================
+const mapOuterDesktop = document.getElementById('map-outer-desktop');
+const mapDesktop = document.getElementById('map-desktop');
+const popDesktop = document.getElementById('pop-desktop');
+const sidePanelDesktop = document.getElementById('side-panel-desktop');
+const zoomPillDesktop = document.getElementById('zoom-pill-desktop');
+const selectionAlertDesktop = document.getElementById('selection-alert-desktop');
+const productPreviewDesktop = document.getElementById('product-preview-desktop');
+
+let showPlantD = true, showCompD = true;
+let overridesD = {};
+let selectedPlantD = null;
+let currentSelD = null;
+let hoverHideTimerD = null;
+
+const desktopCtx = {
+  get selectedPlantName(){ return selectedPlantD; },
+  onSelectPlant(name){
+    selectedPlantD = name;
+    refreshDesktop();
+    if(currentSelD) renderRichPopoverInto(sidePanelDesktop, currentSelD, desktopCtx, {showClose:true});
+    showSelectionAlertDesktop(name);
+  },
+  onExpand(group){
+    expandGroup(overridesD, group);
+    hideClusterPopoverDesktopNow();
+    refreshDesktop();
+    updateZoomPillDesktop();
+  },
+  onClose(){
+    currentSelD = null;
+    renderPanelEmpty(sidePanelDesktop);
+  }
+};
+
+// Individual pin click -> detail renders in the persistent side panel.
+function selectDesktop(sel){
+  currentSelD = sel;
+  renderRichPopoverInto(sidePanelDesktop, sel, desktopCtx, {showClose:true});
+}
+
+// Cluster hover -> quick preview popover with a "Zoom in" button.
+function showClusterPopoverDesktop(sel){
+  clearTimeout(hoverHideTimerD);
+  renderClusterPreviewInto(popDesktop.querySelector('.pop-body'), sel, (items)=> desktopCtx.onExpand(items));
+  positionPopover(popDesktop, mapOuterDesktop, sel);
+}
+function scheduleHideClusterPopoverDesktop(){
+  clearTimeout(hoverHideTimerD);
+  hoverHideTimerD = setTimeout(hideClusterPopoverDesktopNow, 220);
+}
+function hideClusterPopoverDesktopNow(){
+  popDesktop.classList.remove('show');
+  popDesktop.style.visibility = 'hidden';
+}
+
+// Dispatches a pin selection: clusters go to the hover popover, everything else to the side panel.
+function handleMapDesktopSelect(sel){
+  if(sel.type === 'cluster-plant' || sel.type === 'cluster-competitor'){
+    showClusterPopoverDesktop(sel);
+  } else {
+    selectDesktop(sel);
+  }
+}
+
+function refreshDesktop(){
+  const rect = mapDesktop.getBoundingClientRect();
+  renderMap({
+    mapEl: mapDesktop, wPx: rect.width, hPx: rect.height, threshold: 46,
+    showPlant: showPlantD, showCompetitor: showCompD,
+    overrides: overridesD, selectedPlantName: selectedPlantD, mode: 'mixed',
+    onHover: handleMapDesktopSelect, onHoverEnd: scheduleHideClusterPopoverDesktop,
+    onClusterClick: (group)=> desktopCtx.onExpand(group)
+  });
+}
+function updateZoomPillDesktop(){
+  zoomPillDesktop.style.display = Object.keys(overridesD).length ? 'flex' : 'none';
+}
+function showSelectionAlertDesktop(name){
+  selectionAlertDesktop.style.display = 'block';
+  selectionAlertDesktop.querySelector('.sa-name').textContent = name;
+  productPreviewDesktop.style.display = 'block';
+  document.getElementById('pp-plant-name-desktop').textContent = name;
+}
+function clearSelectionDesktop(){
+  selectedPlantD = null;
+  productPreviewDesktop.style.display = 'none';
+  selectionAlertDesktop.style.display = 'none';
+  refreshDesktop();
+  if(currentSelD) renderRichPopoverInto(sidePanelDesktop, currentSelD, desktopCtx, {showClose:true});
+}
+
+renderPanelEmpty(sidePanelDesktop);
+refreshDesktop();
+mapDesktop.querySelector('.toggle-plant').addEventListener('change', e=>{ showPlantD = e.target.checked; refreshDesktop(); });
+mapDesktop.querySelector('.toggle-competitor').addEventListener('change', e=>{ showCompD = e.target.checked; refreshDesktop(); });
+zoomPillDesktop.addEventListener('click', ()=>{ overridesD = {}; refreshDesktop(); updateZoomPillDesktop(); });
+popDesktop.querySelector('.pop-close').addEventListener('click', hideClusterPopoverDesktopNow);
+popDesktop.addEventListener('mouseenter', ()=> clearTimeout(hoverHideTimerD));
+popDesktop.addEventListener('mouseleave', scheduleHideClusterPopoverDesktop);
+mapDesktop.addEventListener('click', ()=> hideClusterPopoverDesktopNow());
+selectionAlertDesktop.querySelector('.sa-trash').addEventListener('click', clearSelectionDesktop);
+selectionAlertDesktop.querySelector('.sa-delete-all').addEventListener('click', clearSelectionDesktop);
+selectionAlertDesktop.querySelector('.sa-goto').addEventListener('click', ()=>{
+  productPreviewDesktop.scrollIntoView({ behavior:'smooth', block:'center' });
+});
+
+// ==================================================================
+// Mobile — tap a pin, rich detail in the bottom sheet
+// ==================================================================
+const mapMobile = document.getElementById('map-mobile');
+const sheet = document.getElementById('bottom-sheet');
+const sheetBody = document.getElementById('sheet-body');
+const sheetBackdrop = document.getElementById('sheet-backdrop');
+const layersBtn = document.getElementById('layers-btn');
+const layersDropdown = document.getElementById('layers-dropdown');
+const zoomPillMobile = document.getElementById('zoom-pill-mobile');
+const selectionAlertMobile = document.getElementById('selection-alert-mobile');
+
+let showPlantM = true, showCompM = true;
+let overridesM = {};
+let selectedPlantM = null;
+let currentSelM = null;
+
+const mobileCtx = {
+  get selectedPlantName(){ return selectedPlantM; },
+  onSelectPlant(name){
+    selectedPlantM = name;
+    refreshMobile();
+    if(currentSelM) renderRichPopoverInto(sheetBody, currentSelM, mobileCtx, {showClose:false});
+    selectionAlertMobile.style.display = 'block';
+    selectionAlertMobile.querySelector('.sa-name').textContent = name;
+  },
+  onExpand(group){
+    expandGroup(overridesM, group);
+    sheet.classList.remove('show'); sheetBackdrop.classList.remove('show');
+    refreshMobile();
+    updateZoomPillMobile();
+  }
+};
+
+function showSheetMobile(sel){
+  currentSelM = sel;
+  renderRichPopoverInto(sheetBody, sel, mobileCtx, {showClose:false});
+  sheet.classList.add('show');
+  sheetBackdrop.classList.add('show');
+  layersDropdown.classList.remove('show');
+}
+function refreshMobile(){
+  // No preview state for clusters on mobile: tapping one zooms in immediately. Tapping an
+  // individual pin opens the rich detail drawer.
+  const rect = mapMobile.getBoundingClientRect();
+  renderMap({
+    mapEl: mapMobile, wPx: rect.width, hPx: rect.height, threshold: 40,
+    showPlant: showPlantM, showCompetitor: showCompM,
+    overrides: overridesM, selectedPlantName: selectedPlantM, mode: 'tap-direct',
+    onHover: showSheetMobile, onHoverEnd: ()=>{}, onClusterClick: (group)=> mobileCtx.onExpand(group)
+  });
+}
+function updateZoomPillMobile(){
+  zoomPillMobile.style.display = Object.keys(overridesM).length ? 'flex' : 'none';
+}
+function clearSelectionMobile(){
+  selectedPlantM = null;
+  selectionAlertMobile.style.display = 'none';
+  refreshMobile();
+  if(currentSelM) renderRichPopoverInto(sheetBody, currentSelM, mobileCtx, {showClose:false});
+}
+
+refreshMobile();
+mapMobile.querySelector('.toggle-plant-m').addEventListener('change', e=>{ showPlantM = e.target.checked; refreshMobile(); });
+mapMobile.querySelector('.toggle-competitor-m').addEventListener('change', e=>{ showCompM = e.target.checked; refreshMobile(); });
+layersBtn.addEventListener('click', (e)=>{ e.stopPropagation(); layersDropdown.classList.toggle('show'); });
+sheetBackdrop.addEventListener('click', ()=>{ sheet.classList.remove('show'); sheetBackdrop.classList.remove('show'); });
+mapMobile.addEventListener('click', ()=> layersDropdown.classList.remove('show'));
+zoomPillMobile.addEventListener('click', ()=>{ overridesM = {}; refreshMobile(); updateZoomPillMobile(); });
+selectionAlertMobile.querySelector('.sa-trash').addEventListener('click', clearSelectionMobile);
+selectionAlertMobile.querySelector('.sa-delete-all').addEventListener('click', clearSelectionMobile);
+
+// ==================================================================
+// Create Quote — Job Site Address map (view-only address, multi-select locations)
+// ==================================================================
+const mapOuterQuote = document.getElementById('map-outer-quote');
+const mapQuote = document.getElementById('map-quote');
+const popQuote = document.getElementById('pop-quote');
+const sidePanelQuote = document.getElementById('side-panel-quote');
+const zoomPillQuote = document.getElementById('zoom-pill-quote');
+const selectionAlertQuote = document.getElementById('selection-alert-quote');
+
+let showPlantQ = true, showCompQ = true;
+let overridesQ = {};
+let selectedPlantsQ = [];       // multi-select: an array of plant names
+let currentSelQ = null;
+let hoverHideTimerQ = null;
+// The plant already chosen while creating the project — shown pre-selected once a Project is picked.
+const inheritedPlantsQ = [plants[0].name];
+
+const quoteCtx = {
+  get selectedPlantNames(){ return selectedPlantsQ; },
+  selectLabel: '+ Select For This Quote',
+  selectedLabel: '✓ Selected For This Quote',
+  inheritedLabel: '⊙ Selected For This Quote',
+  isInherited(name){ return inheritedPlantsQ.includes(name); },
+  onSelectPlant(name){
+    if(!selectedPlantsQ.includes(name)) selectedPlantsQ.push(name);
+    refreshQuoteMap();
+    if(currentSelQ) renderRichPopoverInto(sidePanelQuote, currentSelQ, quoteCtx, {showClose:true});
+    renderSelectionAlertQuote();
+  },
+  onExpand(group){
+    expandGroup(overridesQ, group);
+    hideClusterPopoverQuoteNow();
+    refreshQuoteMap();
+    updateZoomPillQuote();
+  },
+  onClose(){
+    currentSelQ = null;
+    renderPanelEmpty(sidePanelQuote);
+  }
+};
+
+function selectQuote(sel){
+  currentSelQ = sel;
+  renderRichPopoverInto(sidePanelQuote, sel, quoteCtx, {showClose:true});
+}
+function showClusterPopoverQuote(sel){
+  clearTimeout(hoverHideTimerQ);
+  renderClusterPreviewInto(popQuote.querySelector('.pop-body'), sel, (items)=> quoteCtx.onExpand(items));
+  positionPopover(popQuote, mapOuterQuote, sel);
+}
+function scheduleHideClusterPopoverQuote(){
+  clearTimeout(hoverHideTimerQ);
+  hoverHideTimerQ = setTimeout(hideClusterPopoverQuoteNow, 220);
+}
+function hideClusterPopoverQuoteNow(){
+  popQuote.classList.remove('show');
+  popQuote.style.visibility = 'hidden';
+}
+function handleMapQuoteSelect(sel){
+  if(sel.type === 'cluster-plant' || sel.type === 'cluster-competitor'){
+    showClusterPopoverQuote(sel);
+  } else {
+    selectQuote(sel);
+  }
+}
+function refreshQuoteMap(){
+  const rect = mapQuote.getBoundingClientRect();
+  renderMap({
+    mapEl: mapQuote, wPx: rect.width, hPx: rect.height, threshold: 46,
+    showPlant: showPlantQ, showCompetitor: showCompQ,
+    overrides: overridesQ, selectedPlantNames: selectedPlantsQ, mode: 'mixed',
+    onHover: handleMapQuoteSelect, onHoverEnd: scheduleHideClusterPopoverQuote,
+    onClusterClick: (group)=> quoteCtx.onExpand(group)
+  });
+}
+function updateZoomPillQuote(){
+  zoomPillQuote.style.display = Object.keys(overridesQ).length ? 'flex' : 'none';
+}
+function removeSelectedPlantQuote(name){
+  selectedPlantsQ = selectedPlantsQ.filter(n=> n !== name);
+  refreshQuoteMap();
+  renderSelectionAlertQuote();
+  if(currentSelQ) renderRichPopoverInto(sidePanelQuote, currentSelQ, quoteCtx, {showClose:true});
+}
+function renderSelectionAlertQuote(){
+  if(selectedPlantsQ.length === 0){
+    selectionAlertQuote.style.display = 'none';
+    selectionAlertQuote.innerHTML = '';
+    return;
+  }
+  selectionAlertQuote.style.display = 'block';
+  const count = selectedPlantsQ.length;
+  const items = selectedPlantsQ.map(name=>`
+    <div class="sa-item"><span class="sa-arrow">↳</span><span class="sa-name">${name}</span><span class="sa-trash" data-name="${name}" title="Remove">🗑</span></div>
+  `).join('');
+  selectionAlertQuote.innerHTML = `
+    <div class="sa-head"><span class="sa-check">✓</span><span class="sa-title">${count} Selected location${count>1?'s':''} for this quote</span></div>
+    ${items}
+    <div class="sa-actions">
+      <span class="sa-action sa-delete-all">🗑 Delete All</span>
+      <span class="sa-divider"></span>
+      <span class="sa-action sa-goto">Go To Product(S) Info ↗</span>
+    </div>`;
+  selectionAlertQuote.querySelectorAll('.sa-trash').forEach(t=>{
+    t.addEventListener('click', ()=> removeSelectedPlantQuote(t.dataset.name));
+  });
+  selectionAlertQuote.querySelector('.sa-delete-all').addEventListener('click', ()=>{
+    selectedPlantsQ = [];
+    refreshQuoteMap();
+    renderSelectionAlertQuote();
+    if(currentSelQ) renderRichPopoverInto(sidePanelQuote, currentSelQ, quoteCtx, {showClose:true});
+  });
+  selectionAlertQuote.querySelector('.sa-goto').addEventListener('click', ()=>{
+    activateQuoteStep(2);
+    document.getElementById('quote-product-info-row').scrollIntoView({ behavior:'smooth', block:'start' });
+  });
+}
+
+// ---------------- Quote drawer: step switching (Quote Information <-> Product(s) Info) ----------------
+const quoteInfoRow = document.getElementById('quote-info-row');
+const quoteInfoBlock = document.getElementById('quote-info-block');
+const quoteProductInfoRow = document.getElementById('quote-product-info-row');
+const quoteProductInfoBlock = document.getElementById('quote-product-info-block');
+function activateQuoteStep(stepNum){
+  quoteInfoRow.classList.toggle('active', stepNum === 1);
+  quoteInfoBlock.style.display = stepNum === 1 ? 'block' : 'none';
+  quoteProductInfoRow.classList.toggle('active', stepNum === 2);
+  quoteProductInfoBlock.style.display = stepNum === 2 ? 'block' : 'none';
+}
+quoteInfoRow.addEventListener('click', ()=> activateQuoteStep(1));
+quoteProductInfoRow.addEventListener('click', ()=> activateQuoteStep(2));
+
+renderPanelEmpty(sidePanelQuote);
+refreshQuoteMap();
+mapQuote.querySelector('.toggle-plant-quote').addEventListener('change', e=>{ showPlantQ = e.target.checked; refreshQuoteMap(); });
+mapQuote.querySelector('.toggle-competitor-quote').addEventListener('change', e=>{ showCompQ = e.target.checked; refreshQuoteMap(); });
+zoomPillQuote.addEventListener('click', ()=>{ overridesQ = {}; refreshQuoteMap(); updateZoomPillQuote(); });
+popQuote.querySelector('.pop-close').addEventListener('click', hideClusterPopoverQuoteNow);
+popQuote.addEventListener('mouseenter', ()=> clearTimeout(hoverHideTimerQ));
+popQuote.addEventListener('mouseleave', scheduleHideClusterPopoverQuote);
+mapQuote.addEventListener('click', ()=> hideClusterPopoverQuoteNow());
+
+// ---------------- "Project*" dropdown reveals the read-only Job Site Address + map ----------------
+const qProjectSelect = document.getElementById('q-project');
+const quoteJobSiteBlock = document.getElementById('quote-job-site-block');
+const qName = document.getElementById('q-name');
+const qCreationDate = document.getElementById('q-creation-date');
+const qRevisionDate = document.getElementById('q-revision-date');
+const qExpirationDate = document.getElementById('q-expiration-date');
+const qStatus = document.getElementById('q-status');
+const qSalesperson = document.getElementById('q-salesperson');
+
+qProjectSelect.addEventListener('change', ()=>{
+  if(qProjectSelect.value){
+    qName.value = 'Amazon Warehouse – Charlotte';
+    qCreationDate.value = '10/23/2024';
+    qRevisionDate.value = '10/30/2024';
+    qExpirationDate.value = '11/22/2024';
+    qStatus.value = 'Draft';
+    qSalesperson.value = 'John Oliver';
+    quoteJobSiteBlock.style.display = 'block';
+    inheritedPlantsQ.forEach(name=>{ if(!selectedPlantsQ.includes(name)) selectedPlantsQ.push(name); });
+
+    // Pre-expand the cluster the inherited plant sits in, so the map opens already "zoomed in" on
+    // it instead of hiding it inside a cluster badge — matches the reference state directly.
+    const rect = mapQuote.getBoundingClientRect();
+    const groups = clusterPins(plants, rect.width, rect.height, 46, overridesQ);
+    const inheritedGroup = groups.find(g=> g.some(p=> p.name === inheritedPlantsQ[0]));
+    if(inheritedGroup && inheritedGroup.length > 1){
+      expandGroup(overridesQ, inheritedGroup);
+      updateZoomPillQuote();
+    }
+
+    refreshQuoteMap();
+    renderSelectionAlertQuote();
+    // Show the map already in the "here's your inherited location" state — side panel open on the
+    // plant carried over from the project, not the empty "click a pin" placeholder.
+    const inheritedPlant = plants.find(p=> p.name === inheritedPlantsQ[0]);
+    if(inheritedPlant){
+      selectQuote({ type:'plant', item: inheritedPlant, x: inheritedPlant.x, y: inheritedPlant.y });
+    }
+  } else {
+    qName.value = ''; qCreationDate.value = ''; qRevisionDate.value = ''; qExpirationDate.value = '';
+    qStatus.value = ''; qSalesperson.value = '';
+    quoteJobSiteBlock.style.display = 'none';
+    selectedPlantsQ = [];
+    overridesQ = {};
+    currentSelQ = null;
+    renderPanelEmpty(sidePanelQuote);
+    refreshQuoteMap();
+    renderSelectionAlertQuote();
+  }
+});
+
+// ==================================================================
+// Create Quote — Mobile (tap-direct clusters + full-screen detail drawer, multi-select)
+// ==================================================================
+const mapQuoteM = document.getElementById('map-quote-m');
+const bottomSheetQM = document.getElementById('bottom-sheet-quote-m');
+const sheetBodyQM = document.getElementById('sheet-body-quote-m');
+const sheetBackdropQM = document.getElementById('sheet-backdrop-quote-m');
+const layersBtnQM = document.getElementById('layers-btn-quote-m');
+const layersDropdownQM = document.getElementById('layers-dropdown-quote-m');
+const zoomPillQuoteM = document.getElementById('zoom-pill-quote-m');
+const selectionAlertQuoteM = document.getElementById('selection-alert-quote-m');
+
+let showPlantQM = true, showCompQM = true;
+let overridesQM = {};
+let selectedPlantsQM = [];
+let currentSelQM = null;
+const inheritedPlantsQM = [plants[0].name];
+
+const quoteMobileCtx = {
+  get selectedPlantNames(){ return selectedPlantsQM; },
+  selectLabel: '+ Select For This Quote',
+  selectedLabel: '✓ Selected For This Quote',
+  inheritedLabel: '⊙ Selected For This Quote',
+  isInherited(name){ return inheritedPlantsQM.includes(name); },
+  onSelectPlant(name){
+    if(!selectedPlantsQM.includes(name)) selectedPlantsQM.push(name);
+    refreshQuoteMobileMap();
+    if(currentSelQM) renderRichPopoverInto(sheetBodyQM, currentSelQM, quoteMobileCtx, {showClose:false});
+    renderSelectionAlertQuoteMobile();
+  },
+  onExpand(group){
+    expandGroup(overridesQM, group);
+    bottomSheetQM.classList.remove('show'); sheetBackdropQM.classList.remove('show');
+    refreshQuoteMobileMap();
+    updateZoomPillQuoteMobile();
+  }
+};
+
+function showSheetQuoteMobile(sel){
+  currentSelQM = sel;
+  renderRichPopoverInto(sheetBodyQM, sel, quoteMobileCtx, {showClose:false});
+  bottomSheetQM.classList.add('show');
+  sheetBackdropQM.classList.add('show');
+  layersDropdownQM.classList.remove('show');
+}
+function refreshQuoteMobileMap(){
+  const rect = mapQuoteM.getBoundingClientRect();
+  renderMap({
+    mapEl: mapQuoteM, wPx: rect.width, hPx: rect.height, threshold: 40,
+    showPlant: showPlantQM, showCompetitor: showCompQM,
+    overrides: overridesQM, selectedPlantNames: selectedPlantsQM, mode: 'tap-direct',
+    onHover: showSheetQuoteMobile, onHoverEnd: ()=>{}, onClusterClick: (group)=> quoteMobileCtx.onExpand(group)
+  });
+}
+function updateZoomPillQuoteMobile(){
+  zoomPillQuoteM.style.display = Object.keys(overridesQM).length ? 'flex' : 'none';
+}
+function removeSelectedPlantQuoteMobile(name){
+  selectedPlantsQM = selectedPlantsQM.filter(n=> n !== name);
+  refreshQuoteMobileMap();
+  renderSelectionAlertQuoteMobile();
+  if(currentSelQM) renderRichPopoverInto(sheetBodyQM, currentSelQM, quoteMobileCtx, {showClose:false});
+}
+function renderSelectionAlertQuoteMobile(){
+  if(selectedPlantsQM.length === 0){
+    selectionAlertQuoteM.style.display = 'none';
+    selectionAlertQuoteM.innerHTML = '';
+    return;
+  }
+  selectionAlertQuoteM.style.display = 'block';
+  const count = selectedPlantsQM.length;
+  const items = selectedPlantsQM.map(name=>`
+    <div class="sa-item"><span class="sa-arrow">↳</span><span class="sa-name">${name}</span><span class="sa-trash" data-name="${name}" title="Remove">🗑</span></div>
+  `).join('');
+  selectionAlertQuoteM.innerHTML = `
+    <div class="sa-head"><span class="sa-check">✓</span><span class="sa-title">${count} Selected location${count>1?'s':''} for this quote</span></div>
+    ${items}
+    <div class="sa-actions">
+      <span class="sa-action sa-delete-all">🗑 Delete All</span>
+      <span class="sa-divider"></span>
+      <span class="sa-action sa-goto">Go To Product(S) Info ↗</span>
+    </div>`;
+  selectionAlertQuoteM.querySelectorAll('.sa-trash').forEach(t=>{
+    t.addEventListener('click', ()=> removeSelectedPlantQuoteMobile(t.dataset.name));
+  });
+  selectionAlertQuoteM.querySelector('.sa-delete-all').addEventListener('click', ()=>{
+    selectedPlantsQM = [];
+    refreshQuoteMobileMap();
+    renderSelectionAlertQuoteMobile();
+    if(currentSelQM) renderRichPopoverInto(sheetBodyQM, currentSelQM, quoteMobileCtx, {showClose:false});
+  });
+  selectionAlertQuoteM.querySelector('.sa-goto').addEventListener('click', ()=> activateQuoteMobileStep(2));
+}
+
+// ---------------- Mobile Quote drawer: step switching (Quote Information <-> Product(s) Info) ----------------
+const phoneQuoteInfoBlock = document.getElementById('phone-quote-info-block');
+const phoneQuoteProductBlock = document.getElementById('phone-quote-product-block');
+const phoneStepbarQuoteLabel = document.getElementById('phone-stepbar-quote-label');
+const phoneDotsQuote = document.querySelectorAll('#phone-dots-quote span');
+function activateQuoteMobileStep(stepNum){
+  phoneQuoteInfoBlock.style.display = stepNum === 1 ? 'block' : 'none';
+  phoneQuoteProductBlock.style.display = stepNum === 2 ? 'block' : 'none';
+  phoneStepbarQuoteLabel.textContent = stepNum === 1 ? 'Quote Information* ⌄' : 'Product(s) Info ⌄';
+  phoneDotsQuote.forEach((d,i)=> d.classList.toggle('active', i === stepNum - 1));
+}
+phoneStepbarQuoteLabel.addEventListener('click', ()=>{
+  const onStep1 = phoneQuoteInfoBlock.style.display !== 'none';
+  activateQuoteMobileStep(onStep1 ? 2 : 1);
+});
+
+refreshQuoteMobileMap();
+mapQuoteM.querySelector('.toggle-plant-qm').addEventListener('change', e=>{ showPlantQM = e.target.checked; refreshQuoteMobileMap(); });
+mapQuoteM.querySelector('.toggle-competitor-qm').addEventListener('change', e=>{ showCompQM = e.target.checked; refreshQuoteMobileMap(); });
+layersBtnQM.addEventListener('click', (e)=>{ e.stopPropagation(); layersDropdownQM.classList.toggle('show'); });
+sheetBackdropQM.addEventListener('click', ()=>{ bottomSheetQM.classList.remove('show'); sheetBackdropQM.classList.remove('show'); });
+mapQuoteM.addEventListener('click', ()=> layersDropdownQM.classList.remove('show'));
+zoomPillQuoteM.addEventListener('click', ()=>{ overridesQM = {}; refreshQuoteMobileMap(); updateZoomPillQuoteMobile(); });
+
+// ---------------- Mobile "Project*" dropdown reveals the read-only Job Site Address + map ----------------
+const qmProjectSelect = document.getElementById('qm-project');
+const quoteJobSiteBlockM = document.getElementById('quote-job-site-block-m');
+const qmName = document.getElementById('qm-name');
+const qmStatus = document.getElementById('qm-status');
+const qmSalesperson = document.getElementById('qm-salesperson');
+
+qmProjectSelect.addEventListener('change', ()=>{
+  if(qmProjectSelect.value){
+    qmName.value = 'Amazon Warehouse – Charlotte';
+    qmStatus.value = 'Draft';
+    qmSalesperson.value = 'John Oliver';
+    quoteJobSiteBlockM.style.display = 'block';
+    inheritedPlantsQM.forEach(name=>{ if(!selectedPlantsQM.includes(name)) selectedPlantsQM.push(name); });
+
+    // Pre-expand the cluster the inherited plant sits in, same behavior as the desktop version.
+    const rect = mapQuoteM.getBoundingClientRect();
+    const groups = clusterPins(plants, rect.width, rect.height, 40, overridesQM);
+    const inheritedGroup = groups.find(g=> g.some(p=> p.name === inheritedPlantsQM[0]));
+    if(inheritedGroup && inheritedGroup.length > 1){
+      expandGroup(overridesQM, inheritedGroup);
+      updateZoomPillQuoteMobile();
+    }
+
+    refreshQuoteMobileMap();
+    renderSelectionAlertQuoteMobile();
+  } else {
+    qmName.value = ''; qmStatus.value = ''; qmSalesperson.value = '';
+    quoteJobSiteBlockM.style.display = 'none';
+    selectedPlantsQM = [];
+    overridesQM = {};
+    currentSelQM = null;
+    refreshQuoteMobileMap();
+    renderSelectionAlertQuoteMobile();
+  }
+});
+
+// ---------------- Drawer switch: Create Project <-> Create Quote (desktop + mobile) ----------------
+const drawerProjectDesktop = document.getElementById('drawer-project-desktop');
+const drawerQuoteDesktop = document.getElementById('drawer-quote-desktop');
+const mobileProjectWrap = document.getElementById('mobile-project-wrap');
+const mobileQuoteWrap = document.getElementById('mobile-quote-wrap');
+const mobileViewBtn = document.querySelector('.view-btn[data-view="mobile"]');
+const desktopViewBtn = document.querySelector('.view-btn[data-view="desktop"]');
+
+function applyDrawerSwitch(drawer){
+  drawerProjectDesktop.style.display = drawer === 'quote' ? 'none' : 'flex';
+  drawerQuoteDesktop.style.display = drawer === 'quote' ? 'flex' : 'none';
+  mobileProjectWrap.style.display = drawer === 'quote' ? 'none' : 'block';
+  mobileQuoteWrap.style.display = drawer === 'quote' ? 'block' : 'none';
+}
+document.querySelectorAll('.drawer-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.drawer-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const drawer = btn.dataset.drawer;
+    applyDrawerSwitch(drawer);
+  });
+});
+
+// ---------------- "Open Project To Change Job Site Address ↗" (desktop + mobile) — jump to that
+// project's own Create Project drawer, landed on its Job Site Address step ----------------
+document.querySelectorAll('.qjs-open-project').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    const fromDesktop = !!el.closest('#drawer-quote-desktop');
+    document.querySelector('.drawer-btn[data-drawer="project"]').click();
+    if(fromDesktop){
+      requestAnimationFrame(()=>{
+        document.getElementById('project-job-site-row').scrollIntoView({ behavior:'smooth', block:'start' });
+      });
+    }
+  });
+});
+</script>
+</body>
+</html>
